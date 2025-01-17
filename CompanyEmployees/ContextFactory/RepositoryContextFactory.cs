@@ -33,7 +33,7 @@ namespace CompanyEmployees.ContextFactory
             connectionString = connectionString.Replace("{POSTGRESQL_DB_PASSWORD}", dbPassword);
 
             var builder = new DbContextOptionsBuilder<RepositoryContext>()
-                .UseNpgsql(connectionString);
+                .UseNpgsql(connectionString, b => b.MigrationsAssembly("CompanyEmployees.Infrastructure.Persistence"));
 
             return new RepositoryContext(builder.Options);
         }
