@@ -1,6 +1,5 @@
-﻿namespace CompanyEmployees.Core.Services.Abstractions
+﻿namespace CompanyEmployees.Core.Services.Abstractions;
+
+public interface IEmployeeService
 {
-    public interface IEmployeeService
-    {
-    }
 }

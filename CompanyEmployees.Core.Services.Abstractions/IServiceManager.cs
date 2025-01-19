@@ -1,8 +1,7 @@
-﻿namespace CompanyEmployees.Core.Services.Abstractions
+﻿namespace CompanyEmployees.Core.Services.Abstractions;
+
+public interface IServiceManager
 {
-    public interface IServiceManager
-    {
-        ICompanyService CompanyService { get; }
-        IEmployeeService EmployeeService { get; }
-    }
+    ICompanyService CompanyService { get; }
+    IEmployeeService EmployeeService { get; }
 }

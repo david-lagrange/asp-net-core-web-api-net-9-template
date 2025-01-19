@@ -1,6 +1,5 @@
-﻿namespace CompanyEmployees.Core.Domain.Repositories
+﻿namespace CompanyEmployees.Core.Domain.Repositories;
+
+public interface IEmployeeRepository
 {
-    public interface IEmployeeRepository
-    {
-    }
 }

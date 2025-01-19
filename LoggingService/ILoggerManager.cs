@@ -1,10 +1,9 @@
-﻿namespace LoggingService
+﻿namespace LoggingService;
+
+public interface ILoggerManager
 {
-    public interface ILoggerManager
-    {
-        void LogDebug(string message);
-        void LogInformation(string message);
-        void LogWarning(string message);
-        void LogError(string message);
-    }
+    void LogDebug(string message);
+    void LogInformation(string message);
+    void LogWarning(string message);
+    void LogError(string message);
 }
