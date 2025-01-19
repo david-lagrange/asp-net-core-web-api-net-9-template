@@ -1,4 +1,5 @@
-﻿using LoggingService;
+﻿using CompanyEmployees.Core.Domain.Exceptions;
+using LoggingService;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -19,8 +20,13 @@ public class GlobalExceptionHandler : IExceptionHandler
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception,
         CancellationToken cancellationToken)
     {
-        httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
         httpContext.Response.ContentType = "application/json";
+
+        httpContext.Response.StatusCode = exception switch
+        {
+            NotFoundException => StatusCodes.Status404NotFound,
+            _ => StatusCodes.Status500InternalServerError
+        };
 
         _logger.LogError($"Something went wrong: {exception.Message}");
 
@@ -31,7 +37,7 @@ public class GlobalExceptionHandler : IExceptionHandler
         {
             Title = "An error occurred",
             Status = httpContext.Response.StatusCode,
-            Detail = "Internal Server Error.",
+            Detail = exception.Message,
             Type = exception.GetType().Name
         },
             Exception = exception
@@ -42,7 +48,7 @@ public class GlobalExceptionHandler : IExceptionHandler
             {
                 Title = "An error occurred",
                 Status = httpContext.Response.StatusCode,
-                Detail = "Internal Server Error",
+                Detail = exception.Message,
                 Type = exception.GetType().Name
             });
 
