@@ -1,0 +1,5 @@
+Global Error Handling - Lesson 3
+
+What is this application/problem+json header type used for?
+What if we are throwing bad request or not found exceptions? Will it still show internal server error?
+How are we or can we plan for a robust API to client error delivery system using custom exceptions?
