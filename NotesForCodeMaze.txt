@@ -1,5 +1,8 @@
-Global Error Handling - Lesson 3
+## Global Error Handling - Lesson 3
 
-What is this application/problem+json header type used for?
-What if we are throwing bad request or not found exceptions? Will it still show internal server error?
-How are we or can we plan for a robust API to client error delivery system using custom exceptions?
+What is this application/problem+json header type used for? How would a client use it?
+
+## Getting Additional Resources With Relations - Lesson 3
+
+Postman collection missing a "Employees for Existing Company" request. Considering you have all the other requests there I would have expected it.
+
