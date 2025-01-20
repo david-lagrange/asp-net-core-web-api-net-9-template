@@ -6,3 +6,6 @@ public record CompanyDto
     public string? Name { get; init; }
     public string? FullAddress { get; init; }
 }
+
+public record CompanyForCreationDto(string Name, string Address, string Country,
+    IEnumerable<EmployeeForCreationDto> Employees);

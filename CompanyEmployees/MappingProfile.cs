@@ -11,7 +11,9 @@ public class MappingProfile : Profile
         CreateMap<Company, CompanyDto>()
             .ForMember(c => c.FullAddress,
                 opt => opt.MapFrom(x => $"{x.Address} {x.Country}"));
+        CreateMap<CompanyForCreationDto, Company>();
 
         CreateMap<Employee, EmployeeDto>();
+        CreateMap<EmployeeForCreationDto, Employee>();
     }
 }
