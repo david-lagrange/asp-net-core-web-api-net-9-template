@@ -11,6 +11,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="9.0.1" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\CompanyEmployees.Core.Services.Abstractions\CompanyEmployees.Core.Services.Abstractions.csproj" />
     </ItemGroup>
 </Project>
