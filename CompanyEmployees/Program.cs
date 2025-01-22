@@ -6,12 +6,6 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Options;
 using Serilog;
 
-NewtonsoftJsonPatchInputFormatter GetJsonPatchInputFormatter() =>
-    new ServiceCollection().AddLogging().AddMvc().AddNewtonsoftJson()
-    .Services.BuildServiceProvider()
-    .GetRequiredService<IOptions<MvcOptions>>().Value.InputFormatters
-    .OfType<NewtonsoftJsonPatchInputFormatter>().First();
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.ConfigureCors();
@@ -63,3 +57,10 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
+NewtonsoftJsonPatchInputFormatter GetJsonPatchInputFormatter() =>
+    new ServiceCollection().AddLogging().AddMvc().AddNewtonsoftJson()
+    .Services.BuildServiceProvider()
+    .GetRequiredService<IOptions<MvcOptions>>().Value.InputFormatters
+    .OfType<NewtonsoftJsonPatchInputFormatter>().First();

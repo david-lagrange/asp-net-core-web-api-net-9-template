@@ -1,23 +1,25 @@
-﻿using CompanyEmployees.Core.Domain.Entities;
-using CompanyEmployees.Core.Domain.Repositories;
+﻿using CompanyEmployees.Core.Domain.Repositories;
+using CompanyEmployees.Core.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace CompanyEmployees.Infrastructure.Persistence.Repositories;
 
-public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
+internal sealed class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
 {
     public EmployeeRepository(RepositoryContext repositoryContext)
         : base(repositoryContext)
     {
     }
 
-    public IEnumerable<Employee> GetEmployees(Guid companyId, bool trackChanges) =>
-        FindByCondition(e => e.CompanyId.Equals(companyId), trackChanges)
+    public async Task<IEnumerable<Employee>> GetEmployeesAsync(Guid companyId, bool trackChanges,
+        CancellationToken ct = default) =>
+        await FindByCondition(e => e.CompanyId.Equals(companyId), trackChanges)
         .OrderBy(e => e.Name)
-        .ToList();
+        .ToListAsync(ct);
 
-    public Employee GetEmployee(Guid companyId, Guid id, bool trackChanges) =>
-        FindByCondition(e => e.CompanyId.Equals(companyId) && e.Id.Equals(id), trackChanges)
-        .SingleOrDefault()!;
+    public async Task<Employee?> GetEmployeeAsync(Guid companyId, Guid id, bool trackChanges, CancellationToken ct = default) =>
+        await FindByCondition(e => e.CompanyId.Equals(companyId) && e.Id.Equals(id), trackChanges)
+        .SingleOrDefaultAsync(ct);
 
     public void CreateEmployeeForCompany(Guid companyId, Employee employee)
     {
@@ -25,17 +27,21 @@ public class EmployeeRepository : RepositoryBase<Employee>, IEmployeeRepository
         Create(employee);
     }
 
-    public void DeleteEmployee(Company company, Employee employee)
+    public async Task DeleteEmployeeAsync(Company company, Employee employee, CancellationToken ct = default)
     {
+        using var transaction = await RepositoryContext.Database.BeginTransactionAsync(ct);
+
         Delete(employee);
 
-        RepositoryContext.SaveChanges();
+        await RepositoryContext.SaveChangesAsync(ct);
 
         if (!FindByCondition(e => e.CompanyId == company.Id, false).Any())
         {
             RepositoryContext.Companies!.Remove(company);
 
-            RepositoryContext.SaveChanges();
+            await RepositoryContext.SaveChangesAsync(ct);
         }
+
+        await transaction.CommitAsync(ct);
     }
 }

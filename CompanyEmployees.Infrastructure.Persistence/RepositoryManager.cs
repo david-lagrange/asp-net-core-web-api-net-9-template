@@ -20,6 +20,6 @@ public sealed class RepositoryManager : IRepositoryManager
     public ICompanyRepository Company => _companyRepository.Value;
     public IEmployeeRepository Employee => _employeeRepository.Value;
 
-    public void Save() => _repositoryContext.SaveChanges();
+    public Task SaveAsync(CancellationToken ct = default) => _repositoryContext.SaveChangesAsync(ct);
     public IDbContextTransaction BeginTransaction() => _repositoryContext.Database.BeginTransaction();
 }
