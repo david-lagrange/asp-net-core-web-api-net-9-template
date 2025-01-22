@@ -1,7 +1,8 @@
 ﻿using CompanyEmployees.Core.Services.Abstractions;
-using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DataTransferObjects;
+using Microsoft.AspNetCore.JsonPatch;
 
 namespace CompanyEmployees.Infrastructure.Presentation.Controllers;
 
@@ -59,6 +60,9 @@ public class EmployeesController : ControllerBase
         if (employee is null)
             return BadRequest("EmployeeForUpdateDto object is null");
 
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(ModelState);
+
         _service.EmployeeService.UpdateEmployeeForCompany(companyId, id, employee,
             compTrackChanges: false, empTrackChanges: true);
 
@@ -66,8 +70,7 @@ public class EmployeesController : ControllerBase
     }
 
     [HttpPatch("{id:guid}")]
-    public IActionResult PartiallyUpdateEmployeeForCompany(Guid companyId, Guid id,
-    [FromBody] JsonPatchDocument<EmployeeForUpdateDto> patchDoc)
+    public IActionResult PartiallyUpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] JsonPatchDocument<EmployeeForUpdateDto> patchDoc)
     {
         if (patchDoc is null)
             return BadRequest("patchDoc object sent from client is null.");
@@ -76,6 +79,11 @@ public class EmployeesController : ControllerBase
             empTrackChanges: true);
 
         patchDoc.ApplyTo(result.employeeToPatch);
+
+        TryValidateModel(result.employeeToPatch);
+
+        if (!ModelState.IsValid)
+            return UnprocessableEntity(ModelState);
 
         _service.EmployeeService.SaveChangesForPatch(result.employeeToPatch, result.employeeEntity);
 
