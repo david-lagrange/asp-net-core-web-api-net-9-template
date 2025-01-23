@@ -68,6 +68,11 @@ internal sealed class AuthenticationService : IAuthenticationService
 
     public async Task<TokenDto> CreateToken(bool populateExp)
     {
+        if (_user == null)
+        {
+            throw new InvalidOperationException("AuthService CreateToken - User is not set.");
+        }
+
         var signingCredentials = GetSigningCredentials();
         var claims = await GetClaims();
         var tokenOptions = GenerateTokenOptions(signingCredentials, claims);
@@ -84,6 +89,33 @@ internal sealed class AuthenticationService : IAuthenticationService
         var accessToken = new JwtSecurityTokenHandler().WriteToken(tokenOptions);
 
         return new TokenDto(accessToken, refreshToken);
+    }
+    public async Task<TokenDto> RefreshToken(TokenDto tokenDto)
+    {
+        if (tokenDto.AccessToken == null)
+        {
+            throw new ArgumentNullException(nameof(tokenDto.AccessToken));
+        }
+
+        var principal = GetPrincipalFromExpiredToken(tokenDto.AccessToken);
+
+        var userName = principal.Identity?.Name;
+
+        if (userName == null)
+        {
+            throw new RefreshTokenBadRequestException();
+        }
+
+        var user = await _userManager.FindByNameAsync(userName);
+        if (user == null || user.RefreshToken != tokenDto.RefreshToken ||
+            user.RefreshTokenExpiryTime <= DateTime.Now)
+        {
+            throw new RefreshTokenBadRequestException();
+        }
+
+        _user = user;
+
+        return await CreateToken(populateExp: false);
     }
 
     private SigningCredentials GetSigningCredentials()
