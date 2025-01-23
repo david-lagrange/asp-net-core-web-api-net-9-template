@@ -24,9 +24,13 @@ internal sealed class EmployeeService : IEmployeeService
 
     public async Task<(IEnumerable<EmployeeDto> employees, MetaData metaData)> GetEmployeesAsync(Guid companyId, EmployeeParameters employeeParameters, bool trackChanges, CancellationToken ct = default)
     {
+        if (!employeeParameters.ValidAgeRange)
+            throw new MaxAgeRangeBadRequestException();
+
         await CheckIfCompanyExists(companyId, trackChanges, ct);
 
-        var employeesWithMetaData = await _repository.Employee.GetEmployeesAsync(companyId, employeeParameters, trackChanges, ct);
+        var employeesWithMetaData = await _repository.Employee
+            .GetEmployeesAsync(companyId, employeeParameters, trackChanges, ct);
 
         var employeesDto = _mapper.Map<IEnumerable<EmployeeDto>>(employeesWithMetaData);
 
