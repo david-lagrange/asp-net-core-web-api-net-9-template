@@ -1,6 +1,7 @@
 ﻿using CompanyEmployees.Core.Services.Abstractions;
 using CompanyEmployees.Infrastructure.Presentation.ActionFilters;
 using CompanyEmployees.Infrastructure.Presentation.ModelBinders;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DataTransferObjects;
 
@@ -13,6 +14,14 @@ public class CompaniesController : ControllerBase
     private readonly IServiceManager _service;
 
     public CompaniesController(IServiceManager service) => _service = service;
+
+    [HttpOptions]
+    public IActionResult GetCompaniesOptions()
+    {
+        Response.Headers.Append("Allow", "GET, OPTIONS, POST, PUT, DELETE");
+
+        return Ok();
+    }
 
     [HttpGet]
     public async Task<IActionResult> GetCompanies(CancellationToken ct)
