@@ -25,7 +25,7 @@ public class CompaniesController : ControllerBase
     }
 
     [HttpGet]
-    [Authorize]
+    [Authorize(Roles = "Manager")]
     public async Task<IActionResult> GetCompanies(CancellationToken ct)
     {
         var companies = await _service.CompanyService.GetAllCompaniesAsync(trackChanges: false, ct);
