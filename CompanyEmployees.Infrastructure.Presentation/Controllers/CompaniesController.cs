@@ -1,6 +1,7 @@
 ﻿using CompanyEmployees.Core.Services.Abstractions;
 using CompanyEmployees.Infrastructure.Presentation.ActionFilters;
 using CompanyEmployees.Infrastructure.Presentation.ModelBinders;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DataTransferObjects;
@@ -24,6 +25,7 @@ public class CompaniesController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> GetCompanies(CancellationToken ct)
     {
         var companies = await _service.CompanyService.GetAllCompaniesAsync(trackChanges: false, ct);
