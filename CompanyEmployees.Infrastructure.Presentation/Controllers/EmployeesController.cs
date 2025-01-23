@@ -1,8 +1,11 @@
 ﻿using CompanyEmployees.Core.Services.Abstractions;
 using CompanyEmployees.Infrastructure.Presentation.ActionFilters;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DataTransferObjects;
+using Shared.RequestFeatures;
+using System.Text.Json;
 
 namespace CompanyEmployees.Infrastructure.Presentation.Controllers;
 
@@ -15,11 +18,14 @@ public class EmployeesController : ControllerBase
     public EmployeesController(IServiceManager service) => _service = service;
 
     [HttpGet]
-    public async Task<IActionResult> GetEmployeesForCompany(Guid companyId, CancellationToken ct)
+    public async Task<IActionResult> GetEmployeesForCompany(Guid companyId, [FromQuery] EmployeeParameters employeeParameters, CancellationToken ct)
     {
-        var employees = await _service.EmployeeService.GetEmployeesAsync(companyId, trackChanges: false, ct);
+        var pagedResult = await _service.EmployeeService.GetEmployeesAsync(companyId,
+        employeeParameters, trackChanges: false, ct);
 
-        return Ok(employees);
+        Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData));
+
+        return Ok(pagedResult.employees);
     }
 
     [HttpGet("{id:guid}", Name = "GetEmployeeForCompany")]

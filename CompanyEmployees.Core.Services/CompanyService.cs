@@ -32,9 +32,7 @@ internal sealed class CompanyService : ICompanyService
 
     public async Task<CompanyDto> GetCompanyAsync(Guid id, bool trackChanges, CancellationToken ct = default)
     {
-        var company = await _repository.Company.GetCompanyAsync(id, trackChanges, ct);
-        if (company is null)
-            throw new CompanyNotFoundException(id);
+        var company = await GetCompanyAndCheckIfItExists(id, trackChanges, ct);
 
         var companyDto = _mapper.Map<CompanyDto>(company);
 
@@ -59,6 +57,7 @@ internal sealed class CompanyService : ICompanyService
             throw new IdParametersBadRequestException();
 
         var companyEntities = await _repository.Company.GetByIdsAsync(ids, trackChanges, ct);
+
         if (ids.Count() != companyEntities.Count())
             throw new CollectionByIdsBadRequestException();
 
@@ -89,9 +88,7 @@ internal sealed class CompanyService : ICompanyService
 
     public async Task DeleteCompanyAsync(Guid companyId, bool trackChanges, CancellationToken ct = default)
     {
-        var company = await _repository.Company.GetCompanyAsync(companyId, trackChanges, ct);
-        if (company is null)
-            throw new CompanyNotFoundException(companyId);
+        var company = await GetCompanyAndCheckIfItExists(companyId, trackChanges, ct);
 
         _repository.Company.DeleteCompany(company);
         await _repository.SaveAsync(ct);
@@ -100,11 +97,18 @@ internal sealed class CompanyService : ICompanyService
     public async Task UpdateCompanyAsync(Guid companyId, CompanyForUpdateDto companyForUpdate,
         bool trackChanges, CancellationToken ct = default)
     {
-        var companyEntity = await _repository.Company.GetCompanyAsync(companyId, trackChanges, ct);
-        if (companyEntity is null)
-            throw new CompanyNotFoundException(companyId);
+        var company = await GetCompanyAndCheckIfItExists(companyId, trackChanges, ct);
 
-        _mapper.Map(companyForUpdate, companyEntity);
+        _mapper.Map(companyForUpdate, company);
         await _repository.SaveAsync(ct);
+    }
+
+    private async Task<Company> GetCompanyAndCheckIfItExists(Guid id, bool trackChanges, CancellationToken ct)
+    {
+        var company = await _repository.Company.GetCompanyAsync(id, trackChanges, ct);
+        if (company is null)
+            throw new CompanyNotFoundException(id);
+
+        return company;
     }
 }
