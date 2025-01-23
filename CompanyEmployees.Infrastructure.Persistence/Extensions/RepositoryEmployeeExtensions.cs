@@ -19,7 +19,7 @@ public static class RepositoryEmployeeExtensions
 
         var lowerCaseTerm = searchTerm.Trim().ToLower();
 
-        return employees.Where(e => e.Name.ToLower().Contains(lowerCaseTerm));
+        return employees.Where(e => e.Name != null && e.Name.Contains(lowerCaseTerm, StringComparison.OrdinalIgnoreCase));
     }
 
     public static IQueryable<Employee> Sort(this IQueryable<Employee> employees,

@@ -13,9 +13,11 @@ public class ValidationFilterAttribute : IActionFilter
         var action = context.RouteData.Values["action"];
         var controller = context.RouteData.Values["controller"];
 
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
         var param = context.ActionArguments
-            .SingleOrDefault(x => x.Value.ToString().Contains("Dto")).Value;
-        
+            .SingleOrDefault(x => x.Value != null && x.Value.ToString().Contains("Dto")).Value;
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
+
         if (param is null)
         {
             context.Result = new BadRequestObjectResult($"Object is null. Controller: {controller}, action: {action}");
