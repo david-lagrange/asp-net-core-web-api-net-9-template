@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using CompanyEmployees.Core.Domain.ConfigurationModels;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 
 namespace CompanyEmployees.Extensions;
 
@@ -95,4 +97,39 @@ public static class ServiceExtensions
     public static void AddJwtConfiguration(this IServiceCollection services, IConfiguration configuration) => services
         .Configure<JwtConfiguration>(configuration.GetSection("JwtSettings"));
 
+    public static void ConfigureHealthChecks(this IServiceCollection services, IConfiguration configuration)
+    {
+        string databasePasswordEnvVar = "LOCAL_POSTGRESQL_DB_PASSWORD";
+
+        var connectionString = configuration.GetConnectionString("sqlConnection");
+        var dbPassword = Environment.GetEnvironmentVariable(databasePasswordEnvVar);
+
+        if (connectionString == null)
+        {
+            throw new InvalidOperationException("Connection string 'sqlConnection' not found.");
+        }
+
+        if (dbPassword == null)
+        {
+            throw new InvalidOperationException($"Environment variable '{databasePasswordEnvVar}' not found.");
+        }
+
+        connectionString = connectionString.Replace("{POSTGRESQL_DB_PASSWORD}", dbPassword);
+
+        services.AddHealthChecks()
+            .AddNpgSql(connectionString!, name: "PostgreSql Health");
+
+        services.AddHealthChecksUI()
+            .AddInMemoryStorage();
+    }
+
+    public static void ConfigureHealthChecksEndpoints(this WebApplication app)
+    {
+        app.MapHealthChecks("/health", new HealthCheckOptions
+        {
+            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+        });
+
+        app.MapHealthChecksUI();
+    }
 }

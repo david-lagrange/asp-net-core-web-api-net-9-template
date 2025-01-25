@@ -148,11 +148,8 @@ internal sealed class AuthenticationService : IAuthenticationService
         return claims;
     }
 
-    private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials,
-        List<Claim> claims)
+    private JwtSecurityToken GenerateTokenOptions(SigningCredentials signingCredentials, List<Claim> claims)
     {
-        var jwtSettings = _configuration.GetSection("JwtSettings");
-
         var tokenOptions = new JwtSecurityToken
         (
             issuer: _jwtConfiguration.ValidIssuer,
@@ -177,8 +174,6 @@ internal sealed class AuthenticationService : IAuthenticationService
 
     private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
     {
-        var jwtSettings = _configuration.GetSection("JwtSettings");
-
         var tokenValidationParameters = new TokenValidationParameters
         {
             ValidateAudience = true,
