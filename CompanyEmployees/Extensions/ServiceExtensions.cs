@@ -12,6 +12,7 @@ using System.Text;
 using CompanyEmployees.Core.Domain.ConfigurationModels;
 using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.OpenApi.Models;
 
 namespace CompanyEmployees.Extensions;
 
@@ -131,5 +132,59 @@ public static class ServiceExtensions
         });
 
         app.MapHealthChecksUI();
+    }
+
+    public static void ConfigureSwagger(this IServiceCollection services)
+    {
+        services.AddSwaggerGen(s =>
+        {
+            s.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "Equanimity API",
+                Version = "v1",
+                Description = "API by Equanimity",
+                TermsOfService = new Uri("https://www.equanimity-solutions.com/terms-of-use"),
+                Contact = new OpenApiContact
+                {
+                    Name = "David Lagrange",
+                    Email = "david@equanimity-solutions.com",
+                    Url = new Uri("https://www.equanimity-solutions.com/about"),
+                },
+                License = new OpenApiLicense
+                {
+                    Name = "Equanimity API LICX",
+                    Url = new Uri("https://www.equanimity-solutions.com/privacy-policy"),
+                }
+            });
+
+            s.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Place to add JWT with Bearer",
+                Name = "Authorization",
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "Bearer"
+            });
+            s.AddSecurityRequirement(new OpenApiSecurityRequirement()
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        },
+                        Name = "Bearer",
+                    },
+                    new List<string>()
+                }
+            });
+
+            var xmlFile = $"{typeof(Infrastructure.Presentation.AssemblyReference)
+                .Assembly.GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            s.IncludeXmlComments(xmlPath);
+        });
     }
 }

@@ -28,7 +28,7 @@ builder.Services.ConfigureIdentity();
 builder.Services.ConfigureJWT(builder.Configuration);
 builder.Services.AddJwtConfiguration(builder.Configuration);
 builder.Services.ConfigureHealthChecks(builder.Configuration);
-
+builder.Services.ConfigureSwagger();
 
 builder.Services.AddControllers(config =>
 {
@@ -63,6 +63,9 @@ app.UseCors("CorsPolicy");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.MapControllers();
 
