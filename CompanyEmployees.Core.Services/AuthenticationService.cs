@@ -11,6 +11,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Security.Cryptography;
+using CompanyEmployees.Core.Domain.ConfigurationModels;
+using Microsoft.Extensions.Options;
 
 namespace CompanyEmployees.Core.Services;
 
@@ -20,18 +22,21 @@ internal sealed class AuthenticationService : IAuthenticationService
     private readonly IMapper _mapper;
     private readonly UserManager<User> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
-    private readonly IConfiguration _configuration;
+    private readonly IOptions<JwtConfiguration> _configuration;
 
+    private readonly JwtConfiguration _jwtConfiguration;
     private User? _user;
 
     public AuthenticationService(ILoggerManager logger, IMapper mapper,
-        UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+        UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IOptions<JwtConfiguration> configuration)
     {
         _logger = logger;
         _mapper = mapper;
         _userManager = userManager;
         _roleManager = roleManager;
         _configuration = configuration;
+        _jwtConfiguration = new JwtConfiguration();
+        _jwtConfiguration = _configuration.Value;
     }
 
     public async Task<IdentityResult> RegisterUser(UserForRegistrationDto userForRegistration)
@@ -108,7 +113,7 @@ internal sealed class AuthenticationService : IAuthenticationService
 
         var user = await _userManager.FindByNameAsync(userName);
         if (user == null || user.RefreshToken != tokenDto.RefreshToken ||
-            user.RefreshTokenExpiryTime <= DateTime.Now)
+            user.RefreshTokenExpiryTime <= DateTime.UtcNow)
         {
             throw new RefreshTokenBadRequestException();
         }
@@ -150,10 +155,10 @@ internal sealed class AuthenticationService : IAuthenticationService
 
         var tokenOptions = new JwtSecurityToken
         (
-            issuer: jwtSettings["validIssuer"],
-            audience: jwtSettings["validAudience"],
+            issuer: _jwtConfiguration.ValidIssuer,
+            audience: _jwtConfiguration.ValidAudience,
             claims: claims,
-            expires: DateTime.Now.AddMinutes(Convert.ToDouble(jwtSettings["expires"])),
+            expires: DateTime.UtcNow.AddMinutes(Convert.ToDouble(_jwtConfiguration.Expires)),
             signingCredentials: signingCredentials
         );
 
@@ -182,8 +187,8 @@ internal sealed class AuthenticationService : IAuthenticationService
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("API_JWT_SECRET")!)),
             ValidateLifetime = true,
-            ValidIssuer = jwtSettings["validIssuer"],
-            ValidAudience = jwtSettings["validAudience"]
+            ValidIssuer = _jwtConfiguration.ValidIssuer,
+            ValidAudience = _jwtConfiguration.ValidAudience
         };
 
         var tokenHandler = new JwtSecurityTokenHandler();

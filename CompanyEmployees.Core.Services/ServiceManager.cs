@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using CompanyEmployees.Core.Domain.ConfigurationModels;
 using CompanyEmployees.Core.Domain.Entities;
 using CompanyEmployees.Core.Domain.Repositories;
 using CompanyEmployees.Core.Services.Abstractions;
 using LoggingService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 
 namespace CompanyEmployees.Core.Services;
 
@@ -14,7 +16,7 @@ public sealed class ServiceManager : IServiceManager
     private readonly Lazy<IEmployeeService> _employeeService;
     private readonly Lazy<IAuthenticationService> _authenticationService;
 
-    public ServiceManager(IRepositoryManager repositoryManager, ILoggerManager logger, IMapper mapper, UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IConfiguration configuration)
+    public ServiceManager(IRepositoryManager repositoryManager, ILoggerManager logger, IMapper mapper, UserManager<User> userManager, RoleManager<IdentityRole> roleManager, IOptions<JwtConfiguration> configuration)
     {
         _authenticationService = new Lazy<IAuthenticationService>(() => new AuthenticationService(logger, mapper, userManager, roleManager, configuration));
 
