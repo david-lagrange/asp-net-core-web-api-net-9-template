@@ -98,41 +98,41 @@ public static class ServiceExtensions
     public static void AddJwtConfiguration(this IServiceCollection services, IConfiguration configuration) => services
         .Configure<JwtConfiguration>(configuration.GetSection("JwtSettings"));
 
-    public static void ConfigureHealthChecks(this IServiceCollection services, IConfiguration configuration)
-    {
-        string databasePasswordEnvVar = "LOCAL_POSTGRESQL_DB_PASSWORD";
+    //public static void ConfigureHealthChecks(this IServiceCollection services, IConfiguration configuration)
+    //{
+    //    string databasePasswordEnvVar = "LOCAL_POSTGRESQL_DB_PASSWORD";
 
-        var connectionString = configuration.GetConnectionString("sqlConnection");
-        var dbPassword = Environment.GetEnvironmentVariable(databasePasswordEnvVar);
+    //    var connectionString = configuration.GetConnectionString("sqlConnection");
+    //    var dbPassword = Environment.GetEnvironmentVariable(databasePasswordEnvVar);
 
-        if (connectionString == null)
-        {
-            throw new InvalidOperationException("Connection string 'sqlConnection' not found.");
-        }
+    //    if (connectionString == null)
+    //    {
+    //        throw new InvalidOperationException("Connection string 'sqlConnection' not found.");
+    //    }
 
-        if (dbPassword == null)
-        {
-            throw new InvalidOperationException($"Environment variable '{databasePasswordEnvVar}' not found.");
-        }
+    //    if (dbPassword == null)
+    //    {
+    //        throw new InvalidOperationException($"Environment variable '{databasePasswordEnvVar}' not found.");
+    //    }
 
-        connectionString = connectionString.Replace("{POSTGRESQL_DB_PASSWORD}", dbPassword);
+    //    connectionString = connectionString.Replace("{POSTGRESQL_DB_PASSWORD}", dbPassword);
 
-        services.AddHealthChecks()
-            .AddNpgSql(connectionString!, name: "PostgreSql Health");
+    //    services.AddHealthChecks()
+    //        .AddNpgSql(connectionString!, name: "PostgreSql Health");
 
-        services.AddHealthChecksUI()
-            .AddInMemoryStorage();
-    }
+    //    services.AddHealthChecksUI()
+    //        .AddInMemoryStorage();
+    //}
 
-    public static void ConfigureHealthChecksEndpoints(this WebApplication app)
-    {
-        app.MapHealthChecks("/health", new HealthCheckOptions
-        {
-            ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-        });
+    //public static void ConfigureHealthChecksEndpoints(this WebApplication app)
+    //{
+    //    app.MapHealthChecks("/health", new HealthCheckOptions
+    //    {
+    //        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+    //    });
 
-        app.MapHealthChecksUI();
-    }
+    //    // app.MapHealthChecksUI();
+    //}
 
     public static void ConfigureSwagger(this IServiceCollection services)
     {

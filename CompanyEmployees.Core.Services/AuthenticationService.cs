@@ -3,7 +3,6 @@ using CompanyEmployees.Core.Domain.Entities;
 using LoggingService;
 using CompanyEmployees.Core.Services.Abstractions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
 using Shared.DataTransferObjects;
 using CompanyEmployees.Core.Domain.Exceptions;
 using Microsoft.IdentityModel.Tokens;
