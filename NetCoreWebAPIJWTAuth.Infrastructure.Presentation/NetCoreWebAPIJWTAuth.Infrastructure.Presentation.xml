@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NetCoreWebAPIJWTAuth.Infrastructure.Presentation</name>
+    </assembly>
+    <members>
+        <member name="M:NetCoreWebAPIJWTAuth.Infrastructure.Presentation.Controllers.BaseEntitiesController.GetCompanies(System.Threading.CancellationToken)">
+            <summary>
+            Gets the list of all companies
+            </summary>
+            <returns>The companies list</returns>
+        </member>
+        <member name="M:NetCoreWebAPIJWTAuth.Infrastructure.Presentation.Controllers.BaseEntitiesController.CreateBaseEntity(Shared.DataTransferObjects.BaseEntityForCreationDto,System.Threading.CancellationToken)">
+            <summary>
+            Creates a newly created baseEntity
+            </summary>
+            <param name="baseEntity"></param>
+            <returns>A newly created baseEntity</returns>
+            <response code="201">Returns the newly created item</response>
+            <response code="400">If the item is null</response>
+            <response code="422">If the model is invalid</response>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NetCoreWebAPIJWTAuth.Core.Domain\NetCoreWebAPIJWTAuth.Core.Domain.csproj" />
+    <ProjectReference Include="..\NetCoreWebAPIJWTAuth.Core.Services.Abstractions\NetCoreWebAPIJWTAuth.Core.Services.Abstractions.csproj" />
+    <ProjectReference Include="..\LoggingService\LoggingService.csproj" />
+  </ItemGroup>
+
+</Project>
