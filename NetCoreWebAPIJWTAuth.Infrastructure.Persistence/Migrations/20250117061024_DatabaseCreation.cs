@@ -12,7 +12,7 @@ namespace NetCoreWebAPIJWTAuth.Infrastructure.Persistence.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Companies",
+                name: "BaseEntities",
                 columns: table => new
                 {
                     BaseEntityId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -22,11 +22,11 @@ namespace NetCoreWebAPIJWTAuth.Infrastructure.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Companies", x => x.BaseEntityId);
+                    table.PrimaryKey("PK_BaseEntities", x => x.BaseEntityId);
                 });
 
             migrationBuilder.CreateTable(
-                name: "DependantEntitys",
+                name: "DependantEntities",
                 columns: table => new
                 {
                     DependantEntityId = table.Column<Guid>(type: "uuid", nullable: false),
@@ -37,18 +37,18 @@ namespace NetCoreWebAPIJWTAuth.Infrastructure.Persistence.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DependantEntitys", x => x.DependantEntityId);
+                    table.PrimaryKey("PK_DependantEntities", x => x.DependantEntityId);
                     table.ForeignKey(
-                        name: "FK_DependantEntitys_Companies_BaseEntityId",
+                        name: "FK_DependantEntities_BaseEntities_BaseEntityId",
                         column: x => x.BaseEntityId,
-                        principalTable: "Companies",
+                        principalTable: "BaseEntities",
                         principalColumn: "BaseEntityId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_DependantEntitys_BaseEntityId",
-                table: "DependantEntitys",
+                name: "IX_DependantEntities_BaseEntityId",
+                table: "DependantEntities",
                 column: "BaseEntityId");
         }
 
@@ -56,10 +56,10 @@ namespace NetCoreWebAPIJWTAuth.Infrastructure.Persistence.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "DependantEntitys");
+                name: "DependantEntities");
 
             migrationBuilder.DropTable(
-                name: "Companies");
+                name: "BaseEntities");
         }
     }
 }

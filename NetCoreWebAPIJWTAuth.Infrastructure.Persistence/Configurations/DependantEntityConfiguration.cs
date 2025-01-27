@@ -8,7 +8,7 @@ public class DependantEntityConfiguration : IEntityTypeConfiguration<DependantEn
 {
     public void Configure(EntityTypeBuilder<DependantEntity> builder)
     {
-        builder.ToTable("DependantEntitys");
+        builder.ToTable("DependantEntities");
         builder.HasKey(e => e.Id);
         builder.Property(e => e.Id)
                .HasColumnName("DependantEntityId")
@@ -22,7 +22,7 @@ public class DependantEntityConfiguration : IEntityTypeConfiguration<DependantEn
                .IsRequired()
                .HasMaxLength(20);
         builder.HasOne(e => e.BaseEntity)
-               .WithMany(c => c.DependantEntitys)
+               .WithMany(c => c.DependantEntities)
                .HasForeignKey(e => e.BaseEntityId)
                .OnDelete(DeleteBehavior.Cascade);
 

@@ -12,7 +12,7 @@ public record BaseEntityForCreationDto
     public string? Name { get; init; }
     public string? Address { get; init; }
     public string? Country { get; init; }
-    public IEnumerable<DependantEntityForCreationDto>? DependantEntitys { get; init; }
+    public IEnumerable<DependantEntityForCreationDto>? DependantEntities { get; init; }
 }
 
 public record BaseEntityForUpdateDto
@@ -20,5 +20,5 @@ public record BaseEntityForUpdateDto
     public string? Name { get; init; }
     public string? Address { get; init; }
     public string? Country { get; init; }
-    public IEnumerable<DependantEntityForCreationDto>? DependantEntitys { get; init; }
+    public IEnumerable<DependantEntityForCreationDto>? DependantEntities { get; init; }
 }

@@ -8,7 +8,7 @@ public class BaseEntityConfiguration : IEntityTypeConfiguration<BaseEntity>
 {
     public void Configure(EntityTypeBuilder<BaseEntity> builder)
     {
-        builder.ToTable("Companies");
+        builder.ToTable("BaseEntities");
         builder.HasKey(c => c.Id);
         builder.Property(c => c.Id)
                .HasColumnName("BaseEntityId")
@@ -20,7 +20,7 @@ public class BaseEntityConfiguration : IEntityTypeConfiguration<BaseEntity>
                .IsRequired()
                .HasMaxLength(60);
         builder.Property(c => c.Country);
-        builder.HasMany(c => c.DependantEntitys)
+        builder.HasMany(c => c.DependantEntities)
                .WithOne(e => e.BaseEntity)
                .HasForeignKey(e => e.BaseEntityId)
                .OnDelete(DeleteBehavior.Cascade);

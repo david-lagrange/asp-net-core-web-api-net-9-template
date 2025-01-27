@@ -5,10 +5,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shared.DataTransferObjects;
+using Shared.RequestFeatures;
 
 namespace NetCoreWebAPIJWTAuth.Infrastructure.Presentation.Controllers;
 
-[Route("api/companies")]
+[Route("api/baseEntities")]
 [ApiController]
 public class BaseEntitiesController : ControllerBase
 {
@@ -17,24 +18,20 @@ public class BaseEntitiesController : ControllerBase
     public BaseEntitiesController(IServiceManager service) => _service = service;
 
     [HttpOptions]
-    public IActionResult GetCompaniesOptions()
+    public IActionResult GetBaseEntitiesOptions()
     {
         Response.Headers.Append("Allow", "GET, OPTIONS, POST, PUT, DELETE");
 
         return Ok();
     }
 
-    /// <summary>
-    /// Gets the list of all companies
-    /// </summary>
-    /// <returns>The companies list</returns>
     [HttpGet]
     [Authorize(Roles = "Manager")]
-    public async Task<IActionResult> GetCompanies(CancellationToken ct)
+    public async Task<IActionResult> GetBaseEntities([FromQuery] BaseEntityParameters baseEntityParameters, CancellationToken ct)
     {
-        var companies = await _service.BaseEntityService.GetAllCompaniesAsync(trackChanges: false, ct);
+        var baseEntities = await _service.BaseEntityService.GetAllBaseEntitiesAsync(baseEntityParameters, trackChanges: false, ct);
 
-        return Ok(companies);
+        return Ok(baseEntities);
     }
 
     [HttpGet("{id:guid}", Name = "BaseEntityById")]
@@ -45,18 +42,7 @@ public class BaseEntitiesController : ControllerBase
         return Ok(baseEntity);
     }
 
-    /// <summary>
-    /// Creates a newly created baseEntity
-    /// </summary>
-    /// <param name="baseEntity"></param>
-    /// <returns>A newly created baseEntity</returns>
-    /// <response code="201">Returns the newly created item</response>
-    /// <response code="400">If the item is null</response>
-    /// <response code="422">If the model is invalid</response>
     [HttpPost(Name = "CreateBaseEntity")]
-    [ProducesResponseType(201)]
-    [ProducesResponseType(400)]
-    [ProducesResponseType(422)]
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> CreateBaseEntity([FromBody] BaseEntityForCreationDto baseEntity, CancellationToken ct)
     {
@@ -68,9 +54,9 @@ public class BaseEntitiesController : ControllerBase
     [HttpGet("collection/({ids})", Name = "BaseEntityCollection")]
     public async Task<IActionResult> GetBaseEntityCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids, CancellationToken ct)
     {
-        var companies = await _service.BaseEntityService.GetByIdsAsync(ids, trackChanges: false, ct);
+        var baseEntities = await _service.BaseEntityService.GetByIdsAsync(ids, trackChanges: false, ct);
 
-        return Ok(companies);
+        return Ok(baseEntities);
     }
 
     [HttpPost("collection")]
@@ -78,7 +64,7 @@ public class BaseEntitiesController : ControllerBase
     {
         var result = await _service.BaseEntityService.CreateBaseEntityCollectionAsync(baseEntityCollection, ct);
 
-        return CreatedAtRoute("BaseEntityCollection", new { result.ids }, result.companies);
+        return CreatedAtRoute("BaseEntityCollection", new { result.ids }, result.baseEntities);
     }
 
     [HttpDelete("{id:guid}")]

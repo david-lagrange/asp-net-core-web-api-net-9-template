@@ -13,23 +13,22 @@ internal sealed class DependantEntityRepository : RepositoryBase<DependantEntity
     {
     }
 
-    public async Task<PagedList<DependantEntity>> GetDependantEntitysAsync(Guid baseEntityId, DependantEntityParameters employeeParameters, bool trackChanges, CancellationToken ct = default)
+    public async Task<PagedList<DependantEntity>> GetDependantEntitiesAsync(Guid baseEntityId, DependantEntityParameters dependantEntityParameters, bool trackChanges, CancellationToken ct = default)
     {
-        var employeesQuery = FindByCondition(e => e.BaseEntityId.Equals(baseEntityId), trackChanges)
-            .FilterDependantEntitys(employeeParameters.MinAge, employeeParameters.MaxAge)
-            .Search(employeeParameters.SearchTerm ?? string.Empty)
+        var dependantEntitiesQuery = FindByCondition(e => e.BaseEntityId.Equals(baseEntityId), trackChanges)
+            .Search(dependantEntityParameters.SearchTerm ?? string.Empty)
             .OrderBy(e => e.Name);
 
-        var count = await employeesQuery.CountAsync(ct);
+        var count = await dependantEntitiesQuery.CountAsync(ct);
 
-        var employees = await employeesQuery
-            .Skip((employeeParameters.PageNumber - 1) * employeeParameters.PageSize)
-            .Take(employeeParameters.PageSize)
+        var dependantEntities = await dependantEntitiesQuery
+            .Skip((dependantEntityParameters.PageNumber - 1) * dependantEntityParameters.PageSize)
+            .Take(dependantEntityParameters.PageSize)
             .ToListAsync(ct);
 
         return PagedList<DependantEntity>
-            .ToPagedList(employees, count, employeeParameters.PageNumber,
-                employeeParameters.PageSize);
+            .ToPagedList(dependantEntities, count, dependantEntityParameters.PageNumber,
+                dependantEntityParameters.PageSize);
     }
 
     public async Task<DependantEntity?> GetDependantEntityAsync(Guid baseEntityId, Guid id, bool trackChanges, CancellationToken ct = default) =>
@@ -52,7 +51,7 @@ internal sealed class DependantEntityRepository : RepositoryBase<DependantEntity
 
         if (!FindByCondition(e => e.BaseEntityId == baseEntity.Id, false).Any())
         {
-            RepositoryContext.Companies!.Remove(baseEntity);
+            RepositoryContext.BaseEntities!.Remove(baseEntity);
 
             await RepositoryContext.SaveChangesAsync(ct);
         }

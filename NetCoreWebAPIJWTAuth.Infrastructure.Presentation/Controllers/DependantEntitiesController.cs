@@ -9,24 +9,24 @@ using System.Text.Json;
 
 namespace NetCoreWebAPIJWTAuth.Infrastructure.Presentation.Controllers;
 
-[Route("api/companies/{baseEntityId}/employees")]
+[Route("api/baseEntities/{baseEntityId}/dependantEntities")]
 [ApiController]
-public class DependantEntitysController : ControllerBase
+public class DependantEntitiesController : ControllerBase
 {
     private readonly IServiceManager _service;
 
-    public DependantEntitysController(IServiceManager service) => _service = service;
+    public DependantEntitiesController(IServiceManager service) => _service = service;
 
     [HttpGet]
     [HttpHead]
-    public async Task<IActionResult> GetDependantEntitysForBaseEntity(Guid baseEntityId, [FromQuery] DependantEntityParameters employeeParameters, CancellationToken ct)
+    public async Task<IActionResult> GetDependantEntitiesForBaseEntity(Guid baseEntityId, [FromQuery] DependantEntityParameters dependantEntityParameters, CancellationToken ct)
     {
-        var pagedResult = await _service.DependantEntityService.GetDependantEntitysAsync(baseEntityId,
-        employeeParameters, trackChanges: false, ct);
+        var pagedResult = await _service.DependantEntityService.GetDependantEntitiesAsync(baseEntityId,
+        dependantEntityParameters, trackChanges: false, ct);
 
         Response.Headers.Append("X-Pagination", JsonSerializer.Serialize(pagedResult.metaData));
 
-        return Ok(pagedResult.employees);
+        return Ok(pagedResult.dependantEntities);
     }
 
     [HttpGet("{id:guid}", Name = "GetDependantEntityForBaseEntity")]
@@ -41,10 +41,10 @@ public class DependantEntitysController : ControllerBase
     [ServiceFilter(typeof(ValidationFilterAttribute))]
     public async Task<IActionResult> CreateDependantEntityForBaseEntity(Guid baseEntityId, [FromBody] DependantEntityForCreationDto dependantEntity, CancellationToken ct)
     {
-        var employeeToReturn = await _service.DependantEntityService.CreateDependantEntityForBaseEntityAsync(baseEntityId, dependantEntity, trackChanges: false, ct);
+        var dependantEntityToReturn = await _service.DependantEntityService.CreateDependantEntityForBaseEntityAsync(baseEntityId, dependantEntity, trackChanges: false, ct);
 
-        return CreatedAtRoute("GetDependantEntityForBaseEntity", new { baseEntityId, id = employeeToReturn.Id },
-            employeeToReturn);
+        return CreatedAtRoute("GetDependantEntityForBaseEntity", new { baseEntityId, id = dependantEntityToReturn.Id },
+            dependantEntityToReturn);
     }
 
     [HttpDelete("{id:guid}")]
@@ -73,14 +73,14 @@ public class DependantEntitysController : ControllerBase
         var result = await _service.DependantEntityService.GetDependantEntityForPatchAsync(baseEntityId, id,
             compTrackChanges: false, empTrackChanges: true, ct);
 
-        patchDoc.ApplyTo(result.employeeToPatch, ModelState);
+        patchDoc.ApplyTo(result.dependantEntityToPatch, ModelState);
 
-        TryValidateModel(result.employeeToPatch);
+        TryValidateModel(result.dependantEntityToPatch);
 
         if (!ModelState.IsValid)
             return UnprocessableEntity(ModelState);
 
-        await _service.DependantEntityService.SaveChangesForPatchAsync(result.employeeToPatch, result.employeeEntity, ct);
+        await _service.DependantEntityService.SaveChangesForPatchAsync(result.dependantEntityToPatch, result.dependantEntityEntity, ct);
 
         return NoContent();
     }

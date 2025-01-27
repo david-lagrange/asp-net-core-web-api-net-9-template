@@ -19,5 +19,5 @@ public class BaseEntity
 
     public string? Country { get; set; }
 
-    public ICollection<DependantEntity>? DependantEntitys { get; set; }
+    public ICollection<DependantEntity>? DependantEntities { get; set; }
 }

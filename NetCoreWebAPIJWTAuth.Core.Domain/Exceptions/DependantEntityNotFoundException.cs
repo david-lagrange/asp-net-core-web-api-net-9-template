@@ -2,8 +2,8 @@
 
 public class DependantEntityNotFoundException : NotFoundException
 {
-    public DependantEntityNotFoundException(Guid employeeId)
-        : base($"DependantEntity with id: {employeeId} doesn't exist in the database.")
+    public DependantEntityNotFoundException(Guid dependantEntityId)
+        : base($"DependantEntity with id: {dependantEntityId} doesn't exist in the database.")
     {
     }
 }

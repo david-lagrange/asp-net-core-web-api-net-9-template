@@ -1,8 +1,8 @@
 ﻿namespace Shared.RequestFeatures;
 
-public class DependantEntityParameters : RequestParameters
+public class BaseEntityParameters : RequestParameters
 {
-    public DependantEntityParameters() => OrderBy = "name";
+    public BaseEntityParameters() => OrderBy = "name";
     public uint MinAge { get; set; }
     public uint MaxAge { get; set; } = int.MaxValue;
 

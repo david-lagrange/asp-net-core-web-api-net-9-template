@@ -47,7 +47,7 @@ namespace NetCoreWebAPIJWTAuth.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Companies");
+                    b.ToTable("BaseEntities");
                 });
 
             modelBuilder.Entity("NetCoreWebAPIJWTAuth.Core.Domain.Entities.DependantEntity", b =>
@@ -77,13 +77,13 @@ namespace NetCoreWebAPIJWTAuth.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("BaseEntityId");
 
-                    b.ToTable("DependantEntitys");
+                    b.ToTable("DependantEntities");
                 });
 
             modelBuilder.Entity("NetCoreWebAPIJWTAuth.Core.Domain.Entities.DependantEntity", b =>
                 {
                     b.HasOne("NetCoreWebAPIJWTAuth.Core.Domain.Entities.BaseEntity", "BaseEntity")
-                        .WithMany("DependantEntitys")
+                        .WithMany("DependantEntities")
                         .HasForeignKey("BaseEntityId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -93,7 +93,7 @@ namespace NetCoreWebAPIJWTAuth.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("NetCoreWebAPIJWTAuth.Core.Domain.Entities.BaseEntity", b =>
                 {
-                    b.Navigation("DependantEntitys");
+                    b.Navigation("DependantEntities");
                 });
 #pragma warning restore 612, 618
         }

@@ -27,6 +27,6 @@ public class RepositoryContext : IdentityDbContext<User>
         modelBuilder.ApplyConfiguration(new RoleConfiguration());
     }
 
-    public DbSet<BaseEntity>? Companies { get; set; }
-    public DbSet<DependantEntity>? DependantEntitys { get; set; }
+    public DbSet<BaseEntity>? BaseEntities { get; set; }
+    public DbSet<DependantEntity>? DependantEntities { get; set; }
 }

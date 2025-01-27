@@ -22,84 +22,81 @@ internal sealed class DependantEntityService : IDependantEntityService
         _mapper = mapper;
     }
 
-    public async Task<(IEnumerable<DependantEntityDto> employees, MetaData metaData)> GetDependantEntitysAsync(Guid baseEntityId, DependantEntityParameters employeeParameters, bool trackChanges, CancellationToken ct = default)
+    public async Task<(IEnumerable<DependantEntityDto> dependantEntities, MetaData metaData)> GetDependantEntitiesAsync(Guid baseEntityId, DependantEntityParameters dependantEntityParameters, bool trackChanges, CancellationToken ct = default)
     {
-        if (!employeeParameters.ValidAgeRange)
-            throw new MaxAgeRangeBadRequestException();
-
         await CheckIfBaseEntityExists(baseEntityId, trackChanges, ct);
 
-        var employeesWithMetaData = await _repository.DependantEntity
-            .GetDependantEntitysAsync(baseEntityId, employeeParameters, trackChanges, ct);
+        var dependantEntitiesWithMetaData = await _repository.DependantEntity
+            .GetDependantEntitiesAsync(baseEntityId, dependantEntityParameters, trackChanges, ct);
 
-        var employeesDto = _mapper.Map<IEnumerable<DependantEntityDto>>(employeesWithMetaData);
+        var dependantEntitiesDto = _mapper.Map<IEnumerable<DependantEntityDto>>(dependantEntitiesWithMetaData);
 
-        return (employees: employeesDto, metaData: employeesWithMetaData.MetaData);
+        return (dependantEntities: dependantEntitiesDto, metaData: dependantEntitiesWithMetaData.MetaData);
     }
 
     public async Task<DependantEntityDto> GetDependantEntityAsync(Guid baseEntityId, Guid id, bool trackChanges, CancellationToken ct = default)
     {
         await CheckIfBaseEntityExists(baseEntityId, trackChanges, ct);
 
-        var employeeDb = await _repository.DependantEntity.GetDependantEntityAsync(baseEntityId, id, trackChanges, ct);
-        if (employeeDb is null)
+        var dependantEntityDb = await _repository.DependantEntity.GetDependantEntityAsync(baseEntityId, id, trackChanges, ct);
+        if (dependantEntityDb is null)
             throw new DependantEntityNotFoundException(id);
 
-        var dependantEntity = _mapper.Map<DependantEntityDto>(employeeDb);
+        var dependantEntity = _mapper.Map<DependantEntityDto>(dependantEntityDb);
         return dependantEntity;
     }
 
-    public async Task<DependantEntityDto> CreateDependantEntityForBaseEntityAsync(Guid baseEntityId, DependantEntityForCreationDto employeeForCreation, bool trackChanges, CancellationToken ct = default)
+    public async Task<DependantEntityDto> CreateDependantEntityForBaseEntityAsync(Guid baseEntityId, DependantEntityForCreationDto dependantEntityForCreation, bool trackChanges, CancellationToken ct = default)
     {
         await CheckIfBaseEntityExists(baseEntityId, trackChanges, ct);
 
-        var employeeEntity = _mapper.Map<DependantEntity>(employeeForCreation);
+        var dependantEntityEntity = _mapper.Map<DependantEntity>(dependantEntityForCreation);
 
-        _repository.DependantEntity.CreateDependantEntityForBaseEntity(baseEntityId, employeeEntity);
+        _repository.DependantEntity.CreateDependantEntityForBaseEntity(baseEntityId, dependantEntityEntity);
         await _repository.SaveAsync(ct);
 
-        var employeeToReturn = _mapper.Map<DependantEntityDto>(employeeEntity);
+        var dependantEntityToReturn = _mapper.Map<DependantEntityDto>(dependantEntityEntity);
 
-        return employeeToReturn;
+        return dependantEntityToReturn;
     }
 
     public async Task DeleteDependantEntityForBaseEntityAsync(Guid baseEntityId, Guid id, bool trackChanges, CancellationToken ct = default)
     {
         var baseEntity = await CheckIfBaseEntityExists(baseEntityId, trackChanges, ct);
 
-        var employeeDb = await GetDependantEntityForBaseEntityAndCheckIfItExists(baseEntityId, id,
+        var dependantEntityDb = await GetDependantEntityForBaseEntityAndCheckIfItExists(baseEntityId, id,
             trackChanges, ct);
 
-        await _repository.DependantEntity.DeleteDependantEntityAsync(baseEntity, employeeDb, ct);
+        await _repository.DependantEntity.DeleteDependantEntityAsync(baseEntity, dependantEntityDb, ct);
 
         await _repository.SaveAsync();
     }
 
-    public async Task UpdateDependantEntityForBaseEntityAsync(Guid baseEntityId, Guid id, DependantEntityForUpdateDto employeeForUpdate, bool compTrackChanges, bool empTrackChanges, CancellationToken ct = default)
+    public async Task UpdateDependantEntityForBaseEntityAsync(Guid baseEntityId, Guid id, DependantEntityForUpdateDto dependantEntityForUpdate, bool compTrackChanges, bool empTrackChanges, CancellationToken ct = default)
     {
         await CheckIfBaseEntityExists(baseEntityId, compTrackChanges, ct);
 
-        var employeeDb = await GetDependantEntityForBaseEntityAndCheckIfItExists(baseEntityId, id, empTrackChanges, ct);
+        var dependantEntityDb = await GetDependantEntityForBaseEntityAndCheckIfItExists(baseEntityId, id, empTrackChanges, ct);
 
-        _mapper.Map(employeeForUpdate, employeeDb);
+        _mapper.Map(dependantEntityForUpdate, dependantEntityDb);
 
         await _repository.SaveAsync();
     }
 
-    public async Task<(DependantEntityForUpdateDto employeeToPatch, DependantEntity employeeEntity)> GetDependantEntityForPatchAsync(Guid baseEntityId, Guid id, bool compTrackChanges, bool empTrackChanges, CancellationToken ct)
+    public async Task<(DependantEntityForUpdateDto dependantEntityToPatch, DependantEntity dependantEntityEntity)> GetDependantEntityForPatchAsync(Guid baseEntityId, Guid id, bool compTrackChanges, bool empTrackChanges, CancellationToken ct)
     {
         await CheckIfBaseEntityExists(baseEntityId, compTrackChanges, ct);
 
-        var employeeDb = await GetDependantEntityForBaseEntityAndCheckIfItExists(baseEntityId, id, empTrackChanges, ct);
+        var dependantEntityDb = await GetDependantEntityForBaseEntityAndCheckIfItExists(baseEntityId, id, empTrackChanges, ct);
 
-        var employeeToPatch = _mapper.Map<DependantEntityForUpdateDto>(employeeDb);
+        var dependantEntityToPatch = _mapper.Map<DependantEntityForUpdateDto>(dependantEntityDb);
 
-        return (employeeToPatch, employeeDb);
+        return (dependantEntityToPatch, dependantEntityDb);
     }
 
-    public async Task SaveChangesForPatchAsync(DependantEntityForUpdateDto employeeToPatch, DependantEntity employeeEntity, CancellationToken ct = default)
+    public async Task SaveChangesForPatchAsync(DependantEntityForUpdateDto dependantEntityToPatch, DependantEntity dependantEntityEntity, CancellationToken ct = default)
     {
-        _mapper.Map(employeeToPatch, employeeEntity);
+        _mapper.Map(dependantEntityToPatch, dependantEntityEntity);
 
         await _repository.SaveAsync(ct);
     }
@@ -116,10 +113,10 @@ internal sealed class DependantEntityService : IDependantEntityService
     private async Task<DependantEntity> GetDependantEntityForBaseEntityAndCheckIfItExists(Guid baseEntityId,
         Guid id, bool trackChanges, CancellationToken ct)
     {
-        var employeeDb = await _repository.DependantEntity.GetDependantEntityAsync(baseEntityId, id, trackChanges, ct);
-        if (employeeDb is null)
+        var dependantEntityDb = await _repository.DependantEntity.GetDependantEntityAsync(baseEntityId, id, trackChanges, ct);
+        if (dependantEntityDb is null)
             throw new DependantEntityNotFoundException(id);
-        return employeeDb;
+        return dependantEntityDb;
     }
 }
 
@@ -129,13 +126,13 @@ internal sealed class DependantEntityService : IDependantEntityService
 //    if (baseEntity is null)
 //        throw new BaseEntityNotFoundException(baseEntityId);
 
-//    var employeeForBaseEntity = _repository.DependantEntity.GetDependantEntity(baseEntityId, id, trackChanges);
-//    if (employeeForBaseEntity is null)
+//    var dependantEntityForBaseEntity = _repository.DependantEntity.GetDependantEntity(baseEntityId, id, trackChanges);
+//    if (dependantEntityForBaseEntity is null)
 //        throw new DependantEntityNotFoundException(id);
 
 //    using var trans = _repository.BeginTransaction();
 
-//    _repository.DependantEntity.DeleteDependantEntity(baseEntity, employeeForBaseEntity);
+//    _repository.DependantEntity.DeleteDependantEntity(baseEntity, dependantEntityForBaseEntity);
 
 //    trans.Commit();
 //}

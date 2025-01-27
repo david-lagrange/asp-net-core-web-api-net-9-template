@@ -1,6 +1,8 @@
 ﻿using NetCoreWebAPIJWTAuth.Core.Domain.Repositories;
 using NetCoreWebAPIJWTAuth.Core.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Shared.RequestFeatures;
+using NetCoreWebAPIJWTAuth.Infrastructure.Persistence.Extensions;
 
 namespace NetCoreWebAPIJWTAuth.Infrastructure.Persistence.Repositories;
 
@@ -11,10 +13,24 @@ internal sealed class BaseEntityRepository : RepositoryBase<BaseEntity>, IBaseEn
     {
     }
 
-    public async Task<IEnumerable<BaseEntity>> GetAllCompaniesAsync(bool trackChanges, CancellationToken ct = default) =>
-        await FindAll(trackChanges)
-        .OrderBy(c => c.Name)
-        .ToListAsync(ct);
+    public async Task<PagedList<BaseEntity>> GetAllBaseEntitiesAsync(BaseEntityParameters baseEntityParameters, bool trackChanges, CancellationToken ct = default)
+    {
+        var baseEntitiesQuery = FindAll(trackChanges)
+            .Search(baseEntityParameters.SearchTerm ?? string.Empty)
+            .OrderBy(e => e.Name);
+
+        var count = await baseEntitiesQuery.CountAsync(ct);
+
+        var baseEntities = await baseEntitiesQuery
+            .Skip((baseEntityParameters.PageNumber - 1) * baseEntityParameters.PageSize)
+            .Take(baseEntityParameters.PageSize)
+            .ToListAsync(ct);
+
+        return PagedList<BaseEntity>
+            .ToPagedList(baseEntities, count, baseEntityParameters.PageNumber,
+                baseEntityParameters.PageSize);
+    }
+
 
     public async Task<BaseEntity?> GetBaseEntityAsync(Guid baseEntityId, bool trackChanges, CancellationToken ct = default) =>
         await FindByCondition(c => c.Id.Equals(baseEntityId), trackChanges)

@@ -5,6 +5,7 @@ using NetCoreWebAPIJWTAuth.Core.Domain.Repositories;
 using NetCoreWebAPIJWTAuth.Core.Services.Abstractions;
 using LoggingService;
 using Shared.DataTransferObjects;
+using Shared.RequestFeatures;
 
 namespace NetCoreWebAPIJWTAuth.Core.Services;
 
@@ -21,13 +22,13 @@ internal sealed class BaseEntityService : IBaseEntityService
         _mapper = mapper;
     }
 
-    public async Task<IEnumerable<BaseEntityDto>> GetAllCompaniesAsync(bool trackChanges, CancellationToken ct = default)
+    public async Task<IEnumerable<BaseEntityDto>> GetAllBaseEntitiesAsync(BaseEntityParameters baseEntityParameters, bool trackChanges, CancellationToken ct = default)
     {
-        var companies = await _repository.BaseEntity.GetAllCompaniesAsync(trackChanges, ct);
+        var baseEntities = await _repository.BaseEntity.GetAllBaseEntitiesAsync(baseEntityParameters, trackChanges, ct);
 
-        var companiesDto = _mapper.Map<IEnumerable<BaseEntityDto>>(companies);
+        var baseEntitiesDto = _mapper.Map<IEnumerable<BaseEntityDto>>(baseEntities);
 
-        return companiesDto;
+        return baseEntitiesDto;
     }
 
     public async Task<BaseEntityDto> GetBaseEntityAsync(Guid id, bool trackChanges, CancellationToken ct = default)
@@ -61,12 +62,12 @@ internal sealed class BaseEntityService : IBaseEntityService
         if (ids.Count() != baseEntityEntities.Count())
             throw new CollectionByIdsBadRequestException();
 
-        var companiesToReturn = _mapper.Map<IEnumerable<BaseEntityDto>>(baseEntityEntities);
+        var baseEntitiesToReturn = _mapper.Map<IEnumerable<BaseEntityDto>>(baseEntityEntities);
 
-        return companiesToReturn;
+        return baseEntitiesToReturn;
     }
 
-    public async Task<(IEnumerable<BaseEntityDto> companies, string ids)> CreateBaseEntityCollectionAsync(IEnumerable<BaseEntityForCreationDto> baseEntityCollection, CancellationToken ct = default)
+    public async Task<(IEnumerable<BaseEntityDto> baseEntities, string ids)> CreateBaseEntityCollectionAsync(IEnumerable<BaseEntityForCreationDto> baseEntityCollection, CancellationToken ct = default)
     {
         if (baseEntityCollection is null)
             throw new BaseEntityCollectionBadRequest();
@@ -82,7 +83,7 @@ internal sealed class BaseEntityService : IBaseEntityService
         var baseEntityCollectionToReturn = _mapper.Map<IEnumerable<BaseEntityDto>>(baseEntityEntities);
         var ids = string.Join(",", baseEntityCollectionToReturn.Select(c => c.Id));
 
-        return (companies: baseEntityCollectionToReturn, ids: ids);
+        return (baseEntities: baseEntityCollectionToReturn, ids: ids);
     }
 
 
